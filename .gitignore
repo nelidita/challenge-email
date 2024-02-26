@@ -4,3 +4,8 @@ node_modules/
 
 **/go.work
 **/go.work.sum
+
+# Terraform
+**/.terraform/*
+*.tfstate
+*.tfstate.*
