@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  zincsearch:
+    build: ./emails-indexer
+    ports:
+      - "4080:4080"
+    environment:
+      - ZS_BASE_API_URL=http://localhost:4080/
+      - ZS_INDEX=emails
+      - ZS_USER=admin
+      - ZS_PASSWORD=Complexpass#123
+
+  client:
+    build: ./email-client
+    depends_on:
+      - server
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:8080/
+
+  server:
+    build: ./email-api
+    depends_on:
+      - zincsearch
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - ZS_BASE_API_URL=http://localhost:4080/
+      - ZS_INDEX=emails
+      - ZS_USER=admin
+      - ZS_PASSWORD=Complexpass#123
