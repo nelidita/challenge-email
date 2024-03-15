@@ -16,7 +16,7 @@ func CkeckIndexExists() *http.Response {
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Fatalf("Error in searching for the existence of the index: %v", err)
+		log.Fatalf("Error new request _mapping searching for the existence of the index: %v", err)
 		return nil
 	}
 
@@ -24,7 +24,7 @@ func CkeckIndexExists() *http.Response {
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Printf("error sending api/_mapping HTTP request: %v", err)
+		log.Printf("Error in searching for the existence of the index: %v", err)
 		return nil
 	}
 
@@ -43,7 +43,7 @@ func CreateIndex(emails []models.Email) error {
 	// Returns a chunk of bytes containing the JSON data
 	jsonData, err := json.Marshal(body)
 	if err != nil {
-		log.Panicf("Error to marshall data for create index request: %v", err)
+		log.Panicf("Error convert data to JSON slice bytes: %v", err)
 		return err
 	}
 
