@@ -72,3 +72,17 @@ Vista de la aplicación en modo Mobile
 - npm run dev
 
 - Abrir en el navegador http://localhost:5173
+
+## Profiling
+
+Para ejecutar el profiling y ver graficamente el proceso de indexado de la data sigue los siguientes pasos:
+
+- Abre una terminal
+
+- cd emails-indexer
+
+- go tool pprof cpu.pprof // Para ver el uso de CPU
+
+- go tool pprof memory.pprof // Para el uso de la memoria
+
+- puedes verlo en svg o web o algun otra forma que prefieras.
