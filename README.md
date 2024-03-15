@@ -11,7 +11,7 @@ En la interfaz gráfica, se puede buscar por conincidencia de palabras y ordenar
 ![Frontend vista de escritorio](images/emailSearch1.png)
 Vista de la aplicación en modo Desktop
 
-![Frontend vista mobile](images/emailSearch2.png) | ![Frontend vista mobile de los detalles del correo electrónicos](images/emailSearch3.png)
+![Frontend vista mobile](images/emailSearch2.png) | ![Frontend vista mobile de los detalles del correo electrónicos](images/emailsearch3.png)
 
 Vista de la aplicación en modo Mobile
 

@@ -31,13 +31,13 @@ func main() {
 	// Check index exists
 	res := handlers.CkeckIndexExists()
 	if res.StatusCode == http.StatusOK {
-		log.Printf("Index %s yes it exists", nameIndex)
+		log.Printf("Index %s does exist", nameIndex)
 		err := handlers.DeleteIndex(nameIndex)
 		if err != nil {
 			log.Fatal("Error DELETE index: ", err)
 		}
 	} else {
-		log.Printf("Index %s not exist", nameIndex)
+		log.Printf("Index %s does not exist", nameIndex)
 	}
 
 	handlers.ProcessDataIndexer()

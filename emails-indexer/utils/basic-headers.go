@@ -10,7 +10,7 @@ func SetBasicHeaders(req *http.Request) {
 	password := os.Getenv("ZS_PASSWORD")
 
 	if username == "" || password == "" {
-		panic("ZS_USER and ZS_PASSWORD must be set")
+		panic("ZS_USER and ZS_PASSWORD no exists")
 	}
 
 	req.Header.Set("Content-Type", "application/json")

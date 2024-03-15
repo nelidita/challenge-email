@@ -88,7 +88,7 @@ func CreateIndex(emails []models.Email) error {
 func DeleteIndex(index string) error {
 	url := fmt.Sprintf("%sapi/index/%s", os.Getenv("ZS_BASE_API_URL"), index)
 
-	req, err := http.NewRequest("DELETE", url, nil)
+	req, err := http.NewRequest(http.MethodDelete, url, nil)
 	if err != nil {
 		log.Println("The HTTP request DELETE index failed with error ", err)
 		return err
