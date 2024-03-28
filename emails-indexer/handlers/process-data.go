@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 )
 
 func EmailsDataDirectory() ([]models.Email, error) {
@@ -86,7 +87,18 @@ func mapEmailDetails(details []string) *models.Email {
 		case "Subject":
 			email.Subject = keyValue[1]
 		case "Date":
-			email.Date = keyValue[1]
+			dateStr := keyValue[1]
+			if dateStr != "" {
+				date, err := time.Parse("Mon, 2 Jan 2006 15:04:05 -0700 (MST)", dateStr)
+				if err != nil {
+					log.Fatalf("error time parse \n %v\n", err)
+					return nil
+				} else {
+					email.Date = date
+				}
+			} else {
+				log.Println("La cadena de fecha está vacía")
+			}
 		default:
 			continue
 		}

@@ -6,6 +6,7 @@ import (
 	"emails-indexer/utils"
 	"encoding/json"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -31,27 +32,72 @@ func CkeckIndexExists() *http.Response {
 	return res
 }
 
-func CreateIndex(emails []models.Email) error {
-	url := fmt.Sprintf("%sapi/_bulkv2", os.Getenv("ZS_BASE_API_URL"))
+func CreateIndex() error {
+	url := fmt.Sprintf("%sapi/index", os.Getenv("ZS_BASE_API_URL"))
 	indexName := os.Getenv("ZS_INDEX")
 
-	body := models.CreateIndexRequest{
-		Index:   indexName,
-		Records: emails,
+	body := models.Index{
+		Name:         indexName,
+		Storage_type: "disk",
+		Shard_num:    6,
+		Mappings: models.Mapping{
+			Properties: models.Properties{
+				Id: models.Property{
+					TypeProperty: "text",
+					Index:        true,
+					Store:        true,
+					Sortable:     false,
+				},
+				From: models.Property{
+					TypeProperty: "text",
+					Index:        true,
+					Store:        true,
+					Sortable:     true,
+				},
+				To: models.Property{
+					TypeProperty: "text",
+					Index:        true,
+					Store:        true,
+					Sortable:     true,
+				},
+				Content: models.Property{
+					TypeProperty: "text",
+					Index:        true,
+					Store:        true,
+					Sortable:     true,
+				},
+				Subject: models.Property{
+					TypeProperty: "text",
+					Index:        true,
+					Store:        true,
+					Sortable:     true,
+				},
+				Date: models.Property{
+					TypeProperty: "date",
+					Index:        true,
+					Store:        true,
+					Sortable:     true,
+				},
+				Filepath: models.Property{
+					TypeProperty: "text",
+					Index:        true,
+					Store:        true,
+					Sortable:     false,
+				},
+			},
+		},
 	}
 
-	// Returns a chunk of bytes containing the JSON data
 	jsonData, err := json.Marshal(body)
 	if err != nil {
-		log.Panicf("Error convert data to JSON slice bytes: %v", err)
+		log.Panicf("Error convert data to JSON slice bytes in createIndex: %v", err)
 		return err
 	}
 
-	// POST request to create index with your documents
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewReader(jsonData))
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
 	if err != nil {
 		log.Fatalf(
-			"Error to create new index (%s): %v", os.Getenv("ZS_INDEX"), err)
+			"Error to create index NewRequest in (%s): %v", indexName, err)
 		return err
 	}
 
@@ -59,27 +105,72 @@ func CreateIndex(emails []models.Email) error {
 
 	res, err := http.DefaultClient.Do(req)
 	if err != nil {
-		log.Fatalf("Error to create index: %v", err)
+		log.Fatalf("Error to create index Do: %v", err)
 		return err
 	}
 
 	defer res.Body.Close()
 
-	// Get the json of the response to display in the terminal
-	var responseMap map[string]interface{}
-	err = json.NewDecoder(res.Body).Decode(&responseMap)
+	var resCreateIndex models.ResCreateIndex
+	err = json.NewDecoder(res.Body).Decode(&resCreateIndex)
 	if err != nil {
-		log.Fatalf("Error to decode response JSON: %v", err)
+		log.Fatalf("Error to decode response JSON createIndex: %v", err)
 		return err
 	}
 
-	message, _ := responseMap["message"].(string)
-	recordCount, _ := responseMap["record_count"].(float64)
-	fmt.Println("Message:", message)
-	fmt.Println("Record count:", recordCount)
+	fmt.Println("Index:", resCreateIndex.Index)
+	fmt.Println("Message create Index:", resCreateIndex.Message)
 
 	if res.StatusCode != http.StatusOK {
 		return fmt.Errorf("error creating index: %v", res.Status)
+	}
+
+	return nil
+}
+
+func CreateDocuments(emails []models.Email) error {
+	url := fmt.Sprintf("%sapi/_bulkv2", os.Getenv("ZS_BASE_API_URL"))
+	indexName := os.Getenv("ZS_INDEX")
+	fmt.Printf("Bulk indexName: %s\n", indexName)
+
+	body := models.CreateIndexRequest{
+		Index:   indexName,
+		Records: emails,
+	}
+
+	jsonData, err := json.Marshal(body)
+	if err != nil {
+		log.Fatalf("Error convert data to JSON slice bytes: %v", err)
+		return err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(jsonData))
+	if err != nil {
+		log.Fatalf(
+			"Error to create documents NewRequest (%s): %v", indexName, err)
+		return err
+	}
+
+	utils.SetBasicHeaders(req)
+
+	res, err := http.DefaultClient.Do(req)
+	if err != nil {
+		log.Fatalf("Error to create documents Do: %v", err)
+		return err
+	}
+
+	defer res.Body.Close()
+
+	resBody, err := io.ReadAll(res.Body)
+	if err != nil {
+		log.Print(err)
+		return err
+	}
+	fmt.Printf("Zinc server response body: %s\n", string(resBody))
+
+	if res.StatusCode != http.StatusOK {
+		err := fmt.Errorf("error creating documents statusCode: %v", res.Status)
+		return err
 	}
 
 	return nil

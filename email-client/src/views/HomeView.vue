@@ -28,7 +28,7 @@ onBeforeMount(async () => {
   totalPages.value = Math.ceil(emailsStore.data.total.value / 20)
   isLoading.value = false
   filters.value.orderBy = 'date'
-  filters.value.order = 'asc'
+  filters.value.order = 'desc'
 })
 
 const onSelectEmail = (email: Source) => {
@@ -39,7 +39,7 @@ const onSelectEmail = (email: Source) => {
 const handleSearch = async (filters: IFilters, page: number) => {
   selectedEmail.value = undefined
   currentPage.value = page
-  const order = filters.order === 'asc' ? '' : '-'
+  const order = filters.order === 'desc' ? '' : '-'
   const sortFields = order + filters.orderBy
 
   const payload: IFilters = {
